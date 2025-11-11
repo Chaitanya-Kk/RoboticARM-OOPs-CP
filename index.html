@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RoboArmAI – Intelligent Robotics Through OOP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; line-height: 1.7; overflow-x: hidden; }
+        main { min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 5%; }
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 80px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* HERO */
+        .hero { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); overflow: hidden; }
+        .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 50px 50px; animation: gridMove 20s linear infinite; }
+        @keyframes gridMove { 0% { transform: translate(0,0); } 100% { transform: translate(50px,50px); } }
+        .hero-content { text-align: center; z-index: 2; animation: fadeInUp 1s ease; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .hero h1 { font-size: clamp(3rem, 8vw, 6rem); font-weight: 800; margin-bottom: 1rem; background: linear-gradient(to right, #fff, #e0e7ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero .subtitle { font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 300; margin-bottom: 3rem; opacity: .9; }
+        .cta-button { display: inline-block; padding: 18px 48px; background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.3); border-radius: 50px; color: #fff; text-decoration: none; font-weight: 600; font-size: 1.1rem; backdrop-filter: blur(10px); transition: all .3s ease; }
+        .cta-button:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.6); transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255,255,255,.2); }
+        .scroll-indicator { position: absolute; bottom: 40px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%,20%,50%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-10px)} 60%{transform:translateY(-5px)} }
+
+        /* SVG ICONS */
+        svg.icon { width:56px; height:56px; fill:#667eea; margin-bottom:24px; }
+
+        /* TEAM */
+        .team-section { padding:120px 0; background:linear-gradient(180deg,#000 0%,#1a1a2e 100%); }
+        .team-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:35px; }
+        .team-card { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:24px; padding:45px 35px; text-align:center; transition:all .4s ease; backdrop-filter:blur(10px); }
+        .team-card:hover { transform:translateY(-10px); background:rgba(255,255,255,.08); border-color:#667eea; box-shadow:0 20px 60px rgba(102,126,234,.3); }
+        .team-card h3 { font-size:1.6rem; margin-bottom:16px; color:#667eea; }
+        .team-card ul { text-align:left; margin-top:16px; padding-left:24px; font-size:1rem; opacity:.85; }
+        .team-card li { margin-bottom:8px; }
+
+        /* OOP – CENTERED GRID + FULL-WIDTH CARD */
+        .oop-section { padding:120px 0; background:#000; }
+        .concepts-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+            gap:45px;
+            max-width:1400px;
+            margin:0 auto;
+            justify-content:center;
+        }
+        .concept-card { background:linear-gradient(135deg,rgba(102,126,234,.1),rgba(118,75,162,.1)); border:1px solid rgba(102,126,234,.3); border-radius:24px; padding:55px 45px; position:relative; overflow:hidden; transition:all .5s ease; }
+        .concept-card::before { content:''; position:absolute; top:0; left:0; width:100%; height:4px; background:linear-gradient(to right,#667eea,#764ba2); transform:scaleX(0); transition:transform .5s ease; }
+        .concept-card:hover::before,
+        .concept-card[aria-expanded="true"]::before { transform:scaleX(1); }
+        .concept-card:hover { transform:translateY(-5px); box-shadow:0 20px 60px rgba(102,126,234,.4); }
+        .concept-card .concept-icon { font-size:3rem; margin-bottom:20px; }
+        .concept-card h3 { font-size:1.9rem; margin-bottom:18px; color:#667eea; }
+        .concept-card p { opacity:.85; line-height:1.8; font-size:1.08rem; }
+
+        /* Full-width expandable card */
+        .concept-card.full-width { grid-column:1/-1; margin-top:60px; background:linear-gradient(135deg,rgba(102,126,234,.15),rgba(118,75,162,.15)); border:2px dashed rgba(102,126,234,.4); padding:60px 50px; }
+        .expand-toggle { position:absolute; bottom:15px; right:20px; font-size:.8rem; opacity:.6; transition:opacity .3s; pointer-events:none; }
+        .expandable-card[aria-expanded="true"] .expand-toggle { opacity:0; }
+        .expanded-content { max-height:0; overflow:hidden; opacity:0; transition:all .5s ease; margin-top:20px; padding:0 20px; background:rgba(102,126,234,.1); border-radius:12px; }
+        .expandable-card[aria-expanded="true"] .expanded-content { max-height:2500px; opacity:1; padding:25px 20px; }
+        .oop-detail { margin-bottom:20px; padding-bottom:15px; border-bottom:1px dashed rgba(102,126,234,.3); }
+        .oop-detail:last-child { border-bottom:none; }
+        .oop-detail h4 { color:#667eea; margin-bottom:8px; font-size:1.2rem; }
+        .oop-detail ul,.oop-detail pre { margin:10px 0; font-size:.9rem; }
+        .oop-detail table { width:100%; border-collapse:collapse; margin:10px 0; font-size:.9rem; }
+        .oop-detail th,.oop-detail td { padding:8px; text-align:left; border-bottom:1px solid rgba(102,126,234,.2); }
+        .oop-summary { background:rgba(102,126,234,.2); padding:15px; border-radius:12px; font-weight:600; text-align:center; margin-top:20px; border:1px solid rgba(102,126,234,.4); }
+
+        /* CODE */
+        .code-section { padding:120px 0; background:linear-gradient(180deg,#000 0%,#0f0f1e 100%); }
+        .code-container { max-width:1200px; margin:0 auto; background:#1a1a2e; border-radius:24px; overflow:hidden; border:1px solid rgba(102,126,234,.3); }
+        .code-header { background:linear-gradient(135deg,#667eea,#764ba2); padding:20px 30px; display:flex; align-items:center; gap:10px; font-weight:600; }
+        .code-dots { display:flex; gap:8px; }
+        .code-dot { width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,.3); }
+        .code-content { padding:30px; background:#16213e; max-height:600px; overflow-y:auto; font-family:'Courier New',monospace; font-size:.9rem; line-height:1.6; color:#e0e7ff; }
+        .code-content pre { white-space:pre-wrap; word-wrap:break-word; }
+
+        /* DEMO */
+        .demo-section { padding:120px 0; background:#000; }
+        .demo-container { max-width:1400px; margin:0 auto; background:rgba(255,255,255,.03); border:1px solid rgba(102,126,234,.3); border-radius:24px; padding:60px; text-align:center; }
+        .demo-container iframe { width:100%; height:600px; border:none; border-radius:16px; margin-top:40px; box-shadow:0 20px 60px rgba(102,126,234,.3); }
+
+        /* APPLICATIONS */
+        .applications-section { padding:120px 0; background:linear-gradient(180deg,#000 0%,#1a1a2e 100%); }
+        .app-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:45px; margin-top:60px; }
+        .app-card { background:rgba(255,255,255,.03); border:1px solid rgba(102,126,234,.2); border-radius:24px; padding:55px; transition:all .4s ease; }
+        .app-card:hover { background:rgba(255,255,255,.05); border-color:rgba(102,126,234,.5); transform:scale(1.02); }
+        .app-card h3 { font-size:2.1rem; margin-bottom:24px; color:#667eea; }
+        .code-snippet { background:#0a0a0f; border-radius:12px; padding:24px; margin:24px 0; font-family:'Courier New',monospace; font-size:.88rem; overflow-x:auto; border:1px solid rgba(102,126,234,.2); color:#a5b4fc; }
+
+        /* FEATURES */
+        .features-section { padding:120px 0; background:#000; }
+        .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:35px; margin-top:60px; }
+        .feature-item { display:flex; align-items:flex-start; gap:24px; padding:35px; background:rgba(102,126,234,.05); border-radius:20px; border:1px solid rgba(102,126,234,.1); transition:all .3s ease; }
+        .feature-item:hover { background:rgba(102,126,234,.1); border-color:rgba(102,126,234,.3); }
+        .feature-icon { font-size:2.4rem; min-width:48px; }
+        .feature-text strong { display:block; color:#667eea; margin-bottom:10px; font-size:1.15rem; }
+
+        /* FOOTER */
+        footer { padding:60px 5%; background:#0a0a0f; text-align:center; border-top:1px solid rgba(102,126,234,.2); }
+        footer p { opacity:.6; font-size:.95rem; }
+
+        /* RESPONSIVE */
+        @media (max-width:900px) {
+            .concepts-grid { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+        }
+        @media (max-width:600px) {
+            .concepts-grid { grid-template-columns:1fr; }
+            .concept-card.full-width { padding:40px 20px; }
+            .team-grid,.app-grid,.features-grid { grid-template-columns:1fr; }
+            .hero h1 { font-size:3rem; }
+            .section-title { font-size:2.5rem; }
+        }
+        html { scroll-behavior:smooth; }
+        ::-webkit-scrollbar { width:10px; }
+        ::-webkit-scrollbar-track { background:#0a0a0f; }
+        ::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#667eea,#764ba2); border-radius:5px; }
+    </style>
+</head>
+<body>
+    <main>
+
+        <!-- HERO -->
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-content container">
+                <h1 id="hero-title">RoboArmAI</h1>
+                <p class="subtitle">Intelligent Robotics Powered by Object-Oriented Programming</p>
+                <a href="#team" class="cta-button">Explore the Project</a>
+            </div>
+            <div class="scroll-indicator" aria-hidden="true">
+                <svg width="30" height="40" viewBox="0 0 30 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 5L15 35M15 35L5 25M15 35L25 25" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </section>
+
+        <!-- TEAM -->
+        <section id="team" class="team-section" aria-labelledby="team-title">
+            <div class="container">
+                <h2 id="team-title" class="section-title">Team and Topic Flow</h2>
+                <div class="team-grid">
+                    <article class="team-card">
+                        <h3>Janhavi</h3>
+                        <p>Project motivation & introduction. Explains the vision behind RoboArmAI and its real-world significance.</p>
+                    </article>
+                    <article class="team-card">
+                        <h3>Sharli & Yashraj</h3>
+                        <p>OOPs concepts implemented. Deep dive into encapsulation, abstraction, and modularity principles.</p>
+                    </article>
+                    <article class="team-card">
+                        <h3>Chaitanya & Yash</h3>
+                        <ul>
+                            <li>Training and prediction logic. Technical breakdown of the AI learning mechanism and algorithms.</li>
+                            <li>Visual and code walkthrough. Demonstrates the system architecture and implementation details.</li>
+                        </ul>
+                    </article>
+                    <article class="team-card">
+                        <h3>Full Team</h3>
+                        <p>Applications, improvements & Q&A. Explores future enhancements and practical use cases.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- OOP CONCEPTS (centered + full-width expandable) -->
+        <section class="oop-section" aria-labelledby="oop-title">
+            <div class="container">
+                <h2 id="oop-title" class="section-title">Core OOP Principles</h2>
+                <div class="concepts-grid">
+            <div class="concept-card">
+                <div class="concept-icon">🔒</div>
+                <h3>Encapsulation</h3>
+                <p>Data and logic for the robot arm and AI brain are securely contained within their respective classes, protecting internal state and exposing only necessary interfaces.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🎭</div>
+                <h3>Abstraction</h3>
+                <p>Users interact through clean, intuitive public methods without needing to understand complex internal implementations or algorithms.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🧩</div>
+                <h3>Modularity</h3>
+                <p>Independent, reusable classes enable easy extension, maintenance, and testing of individual components without affecting the entire system.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🔗</div>
+                <h3>Composition</h3>
+                <p>The main simulation intelligently combines RoboticArm and SimpleBrain objects, demonstrating powerful object collaboration patterns.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🚀</div>
+                <h3>Extensibility</h3>
+                <p>Architecture designed for growth - easily add new features, behaviors, or even different types of robotic systems without restructuring.</p>
+            </div>
+        </div>
+
+                    <!-- FULL-WIDTH EXPANDABLE CARD -->
+                    <article class="concept-card full-width expandable-card" id="detailed-oop-card" role="button" tabindex="0" aria-expanded="false" aria-controls="expanded-oop-details">
+                        <div style="text-align:center;margin-bottom:20px;">
+                            <svg class="icon" style="width:60px;height:60px;margin:0 auto 15px;" viewBox="0 0 24 24">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/>
+                            </svg>
+                            <h3 style="font-size:2.2rem;background:linear-gradient(to right,#a78bfa,#60a5fa);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+                                How Main.java Implements OOP
+                            </h3>
+                            <p style="font-size:1.1rem;opacity:.9;margin-top:10px;">
+                                <strong>Click to expand full code-level OOP analysis</strong>
+                            </p>
+                        </div>
+                        <div class="expand-toggle">Click to expand</div>
+                        <div class="expanded-content" id="expanded-oop-details">
+                            <div class="oop-detail">
+                                <h4>Encapsulation</h4>
+                                <p><strong>Private fields + Public methods = Data Safety</strong></p>
+                                <ul>
+                                    <li><code>private String name; private double x, y;</code> → Internal state hidden</li>
+                                    <li><code>private List&lt;double[]&gt; memory</code> → Training data protected</li>
+                                    <li><code>public void moveTo(...)</code>, <code>learn(...)</code> → Only safe operations allowed</li>
+                                    <li><code>private void drawGrid()</code> → Internal helper, not exposed</li>
+                                </ul>
+                                <p><em>No external code can corrupt the arm's position or brain's memory.</em></p>
+                            </div>
+                            <div class="oop-detail">
+                                <h4>Abstraction</h4>
+                                <p><strong>Hide complexity behind simple methods</strong></p>
+                                <ul>
+                                    <li><code>arm.moveTo(x, y, angles)</code> → User doesn't see grid drawing or angle validation</li>
+                                    <li><code>brain.predict(x, y)</code> → Returns angles without exposing weighted average math</li>
+                                    <li>User calls <code>pick()</code> → No need to know gripper mechanics</li>
+                                </ul>
+                                <p><em>Clean API = Easy to use, hard to misuse.</em></p>
+                            </div>
+                            <div class="oop-detail">
+                                <h4>Modularity</h4>
+                                <p><strong>Three independent, focused classes</strong></p>
+                                <table>
+                                    <tr><th>Class</th><th>Responsibility</th></tr>
+                                    <tr><td><code>Main</code></td><td>User I/O & orchestration</td></tr>
+                                    <tr><td><code>RoboticArm</code></td><td>Movement & visualization</td></tr>
+                                    <tr><td><code>SimpleBrain</code></td><td>Learning & prediction</td></tr>
+                                </table>
+                                <p><em>Change one class → others unaffected.</em></p>
+                            </div>
+                            <div class="oop-detail">
+                                <h4>Composition</h4>
+                                <p><strong>Main <em>has-a</em> arm and brain</strong></p>
+                                <pre><code>RoboticArm arm = new RoboticArm(...);
+SimpleBrain brain = new SimpleBrain();
+double[] angles = brain.predict(x, y);
+arm.moveTo(x, y, angles);</code></pre>
+                                <p><em>Robot = Arm + Brain → Real-world object modeling.</em></p>
+                            </div>
+                            <div class="oop-detail">
+                                <h4>Extensibility</h4>
+                                <p><strong>Swap brains, add features easily</strong></p>
+                                <pre><code>// Future:
+Brain brain = new NeuralNetBrain(); // Same interface!</code></pre>
+                                <p><em>Add <code>calibrate()</code>, <code>saveModel()</code> → No core changes needed.</em></p>
+                            </div>
+                            
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- CODE -->
+        <section class="code-section" aria-labelledby="code-title">
+            <div class="container">
+                <h2 id="code-title" class="section-title">The Code</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-dots">
+                            <div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div>
+                        </div>
+                        <div>Main.java</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code>import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Welcome to RoboArmAI!");
+        System.out.println("This robot arm can learn where to move using simple examples.\n");
+        RoboticArm arm = new RoboticArm("RoboArm", 10, 10);
+        SimpleBrain brain = new SimpleBrain();
+        System.out.println("Let's train the arm with 3 examples (x, y, θ1, θ2):\n");
+        for (int i = 1; i <= 3; i++) {
+            System.out.print("Example " + i + " - Enter x: ");
+            double x = sc.nextDouble();
+            System.out.print("Enter y: ");
+            double y = sc.nextDouble();
+            System.out.print("Enter theta1 (angle1): ");
+            double t1 = sc.nextDouble();
+            System.out.print("Enter theta2 (angle2): ");
+            double t2 = sc.nextDouble();
+            brain.learn(x, y, t1, t2);
+            System.out.println();
+        }
+        System.out.println("\nTraining complete! Now let's test the arm.\n");
+        System.out.print("How many pick-and-place operations? ");
+        int n = sc.nextInt();
+        for (int i = 1; i <= n; i++) {
+            System.out.println("\n--- Operation " + i + " ---");
+            System.out.print("Enter pick point (x y): ");
+            double px = sc.nextDouble();
+            double py = sc.nextDouble();
+            double[] pickAngles = brain.predict(px, py);
+            arm.moveTo(px, py, pickAngles);
+            arm.pick();
+            System.out.print("Enter place point (x y): ");
+            double qx = sc.nextDouble();
+            double qy = sc.nextDouble();
+            double[] placeAngles = brain.predict(qx, qy);
+            arm.moveTo(qx, qy, placeAngles);
+            arm.place();
+        }
+        System.out.println("\nAll operations complete!");
+        sc.close();
+    }
+}
+class RoboticArm {
+    private String name;
+    private int gridWidth, gridHeight;
+    private double x, y;
+   
+    public RoboticArm(String name, int gridWidth, int gridHeight) {
+        this.name = name;
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
+        this.x = 0;
+        this.y = 0;
+    }
+   
+    public void moveTo(double x, double y, double[] angles) {
+        this.x = x; this.y = y;
+        System.out.printf("%s moving to (%.1f, %.1f)...\n", name, x, y);
+        System.out.printf("Predicted Angles: θ1=%.1f°, θ2=%.1f°\n", angles[0], angles[1]);
+        drawGrid();
+    }
+   
+    public void pick() {
+        System.out.printf("%s: Picking at (%.1f, %.1f)\n", name, x, y);
+    }
+   
+    public void place() {
+        System.out.printf("%s: Placing at (%.1f, %.1f)\n", name, x, y);
+    }
+   
+    private void drawGrid() {
+        System.out.println("\nWorkspace:");
+        for (int row = gridHeight; row >= 0; row--) {
+            for (int col = 0; col <= gridWidth; col++) {
+                if (Math.round(x) == col && Math.round(y) == row)
+                    System.out.print("* ");
+                else if (row == 0 && col == 0)
+                    System.out.print("O ");
+                else
+                    System.out.print(". ");
+            }
+            System.out.println();
+        }
+    }
+}
+class SimpleBrain {
+    private List<double[]> memory = new ArrayList<>();
+   
+    public void learn(double x, double y, double t1, double t2) {
+        memory.add(new double[]{x, y, t1, t2});
+        System.out.printf("Learned: (%.1f, %.1f) -> [%.1f°, %.1f°]\n", x, y, t1, t2);
+    }
+   
+    public double[] predict(double x, double y) {
+        if (memory.isEmpty()) return new double[]{0, 0};
+       
+        double totalWeight = 0, sumT1 = 0, sumT2 = 0;
+        for (double[] data : memory) {
+            double dx = data[0] - x;
+            double dy = data[1] - y;
+            double dist = Math.sqrt(dx * dx + dy * dy) + 0.001;
+            double weight = 1 / dist;
+            sumT1 += data[2] * weight;
+            sumT2 += data[3] * weight;
+            totalWeight += weight;
+        }
+       
+        return new double[]{sumT1 / totalWeight, sumT2 / totalWeight};
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEMO -->
+        <section class="demo-section" aria-labelledby="demo-title">
+            <div class="container">
+                <h2 id="demo-title" class="section-title">Interactive Visualization</h2>
+                <div class="demo-container">
+                    <p style="opacity:.8;font-size:1.2rem;margin-bottom:20px;">Experience a 3D robot arm simulation that demonstrates the same kinematics and learning principles used in our project.</p>
+                    <iframe src="https://www.babacad.com/robotics/web/#" title="3D Robot Arm Simulation"></iframe>
+                    <p style="opacity:.6;margin-top:30px;">Powered by babacad - <a href="https://www.babacad.com/robotics/web/#" target="_blank" style="color:#667eea;">Open in new tab</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- APPLICATIONS -->
+         <!-- Applications Section -->
+    <section class="applications-section">
+        <div class="container">
+        <h2 class="section-title">Real-World Applications</h2>
+        <div class="app-grid">
+            <div class="app-card">
+                <h3>💰 Finance</h3>
+                <div class="code-snippet">brain.learn(creditScore, income, amount, approved);
+boolean decision = brain.predict(700, 55000, 60000);</div>
+                <p>Intelligent loan approval systems that learn from historical data to make accurate lending decisions based on applicant profiles.</p>
+            </div>
+            
+            <div class="app-card">
+                <h3>🏥 Healthcare</h3>
+                <div class="code-snippet">prostheticBrain.learn(muscleSignal1, muscleSignal2, angle1, angle2);
+double[] movement = prostheticBrain.predict(0.55, 0.36);</div>
+                <p>Adaptive prosthetic control systems that learn individual muscle patterns for natural, personalized movement.</p>
+            </div>
+            
+            <div class="app-card">
+                <h3>📚 Education</h3>
+                <div class="code-snippet">tutorBrain.learn("Algebra", 80, "Quadratic Equations");
+String nextTopic = tutorBrain.predict("Algebra", 65);</div>
+                <p>Personalized learning path recommenders that adapt to student performance and optimize educational outcomes.</p>
+            </div>
+            
+            <div class="app-card">
+                <h3>🌾 Agriculture</h3>
+                <div class="code-snippet">irrigationAI.learn(soilMoisture, temp, rainfall, waterAmount);
+double waterNeeded = irrigationAI.predict(21, 31, 1);</div>
+                <p>Precision irrigation systems that optimize water usage based on environmental conditions and crop requirements.</p>
+            </div>
+            
+            <div class="app-card">
+                <h3>🛒 E-Commerce</h3>
+                <div class="code-snippet">recommender.learn("U42", "P104", true);
+boolean showProduct = recommender.predict("U42", "P216");</div>
+                <p>Intelligent recommendation engines that learn customer preferences for personalized shopping experiences.</p>
+            </div>
+            
+            <div class="app-card">
+                <h3>🏠 Smart Home</h3>
+                <div class="code-snippet">sceneBrain.learn("18:00", "sunny", true, 23.0);
+double temp = sceneBrain.predict("20:00", "rainy", true);</div>
+                <p>Automated home systems that learn user preferences and adjust settings based on time, weather, and occupancy.</p>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+        <h2 class="section-title">Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-text">
+                    <strong>Complete Workflow</strong>
+                    <p>Full training and prediction pipeline with visual feedback and real-time updates</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🏗️</div>
+                <div class="feature-text">
+                    <strong>Solid Architecture</strong>
+                    <p>Built on proven OOP principles: encapsulation, modularity, and abstraction</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-text">
+                    <strong>Visual Learning</strong>
+                    <p>Interactive demonstrations and embedded simulators for hands-on understanding</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">👥</div>
+                <div class="feature-text">
+                    <strong>Team Collaboration</strong>
+                    <p>Structured presentation format with clear role distribution across five members</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-text">
+                    <strong>Highly Extensible</strong>
+                    <p>Modular design allows easy addition of new features and robot types</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🌐</div>
+                <div class="feature-text">
+                    <strong>Cross-Domain</strong>
+                    <p>Same architecture applies to finance, healthcare, education, and more</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>RoboArmAI - Object-Oriented Programming Lab Assessment</p>
+        <p style="margin-top:10px;">Built with precision, powered by innovation</p>
+    </footer>
+
+    <script>
+        // Scroll reveal
+        const observer = new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting){en.target.style.opacity='1';en.target.style.transform='translateY(0)';}}),{threshold:.1,rootMargin:'0px 0px -100px 0px'});
+        document.querySelectorAll('.team-card,.concept-card,.app-card,.feature-item').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(30px)';el.style.transition='opacity .6s ease,transform .6s ease';observer.observe(el);});
+
+        // Stagger
+        document.querySelectorAll('.team-grid,.concepts-grid,.app-grid,.features-grid').forEach(g=>Array.from(g.children).forEach((c,i)=>c.style.transitionDelay=`${i*.1}s`));
+
+        // Expandable OOP card
+        document.addEventListener('DOMContentLoaded',()=>{
+            const card=document.getElementById('detailed-oop-card');
+            const toggle=()=>{const exp=card.getAttribute('aria-expanded')==='true';card.setAttribute('aria-expanded',!exp);};
+            card.addEventListener('click',toggle);
+            card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+        });
+    </script>
+</body>
+</html>
